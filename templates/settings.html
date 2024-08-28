@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройки приложения</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="static/img/logo_mega.svg" alt="Megagroup" width="200">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item me-2">
+                    <a class="btn btn-success" href="/">Главная</a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="btn btn-outline-success disabled" disabled aria-current="page" href="#">Настройки</a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="btn btn-success" href="/history">История</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <hr>
+    <div class="row">
+        <div class="col">
+        <h2>Параметры запроса</h2>
+        <form method="post" class="d-grid">
+            <div class="mb-3">
+                <label for="top_k" class="form-label">Значение Top K</label>
+                <input type="text" class="form-control" id="top_k" name="top_k" value="{{ request_settings['top_k_value'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="extra_data" class="form-label">Дополнительные данные к вопросу</label>
+                <textarea class="form-control" id="extra_data" name="extra_data" rows="5">{{ request_settings['question_extra_data'] }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-success" name="save_request_settings">Сохранить настройки запроса</button>
+        </form>
+        <hr>
+        <h2>Параметры загрузчика данных</h2>
+        <form method="post" class="d-grid">
+            <div class="mb-3">
+                <label for="folder" class="form-label">Folder:</label>
+                <input type="text" class="form-control" id="folder" name="folder" value="{{ downloader_settings['folder'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="content_formatter" class="form-label">Content Formatter:</label>
+<!--                <input type="text" class="form-control" id="content_formatter" name="content_formatter" value="{{ downloader_settings['content_formatter'] }}">-->
+                <select class="form-select" id="content_formatter" name="content_formatter">
+                    {% set current_formatter = downloader_settings['content_formatter'] %}
+                    <option value="HelpMegagroupRuHtml" {% if current_formatter == 'HelpMegagroupRuHtml' %}selected{% endif %}>HelpMegagroupRuHtml</option>
+                    <option value="HelpMegagroupRuPlainText" {% if current_formatter == 'HelpMegagroupRuPlainText' %}selected{% endif %}>HelpMegagroupRuPlainText</option>
+                    <option value="HelpMegagroupRuJson" {% if current_formatter == 'HelpMegagroupRuJson' %}selected{% endif %}>HelpMegagroupRuJson</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success" name="save_downloader_settings">Сохранить настройки загрузчика</button>
+
+        </form>
+        </div>
+        <div class="col">
+        <h2>Параметры индексации данных</h2>
+        <form method="post" class="d-grid">
+            <div class="mb-3">
+                <label for="title_extractor_nodes" class="form-label">Title Extractor Nodes:</label>
+                <input type="text" class="form-control" id="title_extractor_nodes" name="title_extractor_nodes" value="{{ indexer_settings['title_extractor_nodes'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="questions_answered_extractor_questions" class="form-label">Questions Answered Extractor Questions:</label>
+                <input type="text" class="form-control" id="questions_answered_extractor_questions" name="questions_answered_extractor_questions" value="{{ indexer_settings['questions_answered_extractor_questions'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="keyword_extractor_keywords" class="form-label">Keyword Extractor Keywords:</label>
+                <input type="text" class="form-control" id="keyword_extractor_keywords" name="keyword_extractor_keywords" value="{{ indexer_settings['keyword_extractor_keywords'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="index_persist_dir" class="form-label">Index Persist Dir:</label>
+                <input type="text" class="form-control" id="index_persist_dir" name="index_persist_dir" value="{{ indexer_settings['index_persist_dir'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="chunk_size" class="form-label">Chunk Size:</label>
+                <input type="text" class="form-control" id="chunk_size" name="chunk_size" value="{{ indexer_settings['chunk_size'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="chunk_overlap" class="form-label">Chunk Overlap:</label>
+                <input type="text" class="form-control" id="chunk_overlap" name="chunk_overlap" value="{{ indexer_settings['chunk_overlap'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="llm_temperature" class="form-label">LLM Temperature:</label>
+                <input type="text" class="form-control" id="llm_temperature" name="llm_temperature" value="{{ indexer_settings['llm_temperature'] }}">
+            </div>
+            <div class="mb-3">
+                <label for="llm_model" class="form-label">LLM Model:</label>
+                <input type="text" class="form-control" id="llm_model" name="llm_model" value="{{ indexer_settings['llm_model'] }}">
+            </div>
+            <div class="mb3">
+                 <label for="add_to_index">Добавлять в индекс: &nbsp;<input type="checkbox" id="add_to_index" name="add_to_index" {% if indexer_settings['add_to_index'] %}checked{% endif %}></label><br>
+                <br>
+            </div>
+            <button type="submit" class="btn btn-success" name="save_indexer_settings">Сохранить настройки индексатора</button>
+        </form>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+    <h2>URLs</h2>
+    <form method="post" class="d-grid">
+        <div class="mb-3">
+            <label for="urls" class="form-label">URLs</label>
+            <textarea class="form-control" id="urls" name="urls" rows="10">{{ urls }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-success" name="save_urls">Сохранить URL-адреса</button>
+    </form>
+    </div>
+    <hr>
+    <div class="row">
+        <form method="post">
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success btn-lg" name="download_content">Скачать контент</button>
+
+
+                <button type="submit" class="btn btn-success btn-lg" name="index_content">Индексировать контент</button>
+            </div>
+        </form>
+
+    </div>
+    <hr>
+</div>
+</body>
+</html>

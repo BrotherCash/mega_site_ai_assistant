@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .navbar {
+            flex-shrink: 0;
+        }
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .chat-form {
+            flex-shrink: 0;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <img src="static/img/logo_mega.svg" alt="Megagroup" width="200">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item me-2">
+                            <a class="btn btn-outline-success disabled" aria-current="page" href="#">Главная</a>
+                        </li>
+                        <li class="nav-item me-2">
+                            <a class="btn btn-success" href="/settings">Настройки</a>
+                        </li>
+                        <li class="nav-item me-2">
+                            <a class="btn btn-success" href="/history">История</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content-area">
+            <div class="container">
+                <h2>Вопрос-ответ</h2>
+                <div class="chat-messages">
+                    {% raw %}
+                    <div v-for="(message, index) in messages" :key="index">
+                        <p><strong>Вопрос:</strong> {{ message.question }}</p>
+                        <p><strong>Ответ:</strong> <span v-html="message.response"></span></p>
+                        <hr>
+                    </div>
+                    <div v-if="currentResponse">
+                        <p><strong>Вопрос:</strong> {{ question }}</p>
+                        <p><strong>Ответ:</strong> <span v-html="currentResponse"></span></p>
+                    </div>
+                    {% endraw %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-form">
+            <div class="container">
+                {% raw %}
+                <form @submit.prevent="askQuestion">
+                    <div class="input-group">
+                        <input type="text" class="form-control" v-model="question" placeholder="Задайте вопрос">
+                        <button type="submit" class="btn btn-success" :disabled="isLoading">
+                            {{ isLoading ? 'Загрузка...' : 'Задать вопрос' }}
+                        </button>
+                       <button type="button" class="btn btn-danger" @click="resetSession" :disabled="isLoading">
+                           Новая сессия
+                       </button>
+                    </div>
+                </form>
+                {% endraw %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+    {% raw %}
+    new Vue({
+        el: '#app',
+        data: {
+            question: '',
+            messages: [],
+            isLoading: false,
+            currentResponse: ''
+        },
+        methods: {
+            askQuestion() {
+                if (this.question.trim() === '') return;
+
+                this.isLoading = true;
+                this.currentResponse = '';
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/ask_question', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify({ initial_question: this.question }));
+
+                xhr.onprogress = () => {
+                    const newData = xhr.responseText.substring(xhr.seenBytes || 0);
+                    xhr.seenBytes = xhr.responseText.length;
+
+                    const lines = newData.split("\n\n");
+                    lines.forEach(line => {
+                        if (line.startsWith("data: ")) {
+                            const content = line.substring(6);
+                            if (content === "[DONE]") {
+                                this.isLoading = false;
+                            } else {
+                                this.currentResponse += content;
+                            }
+                        }
+                    });
+
+                    this.$nextTick(() => {
+                        const contentArea = document.querySelector('.content-area');
+                        contentArea.scrollTop = contentArea.scrollHeight;
+                    });
+                };
+
+                xhr.onloadend = () => {
+                    this.isLoading = false;
+                    if (this.currentResponse) {
+                        this.messages.push({
+                            question: this.question,
+                            response: this.formatResponse(this.currentResponse)
+                        });
+                    }
+                    this.question = '';
+                    this.currentResponse = '';
+                };
+            },
+            resetSession() {
+                this.isLoading = true;
+                this.currentResponse = '';
+
+                // Очищаем историю сообщений
+                this.messages = [];
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/reset_session', true);
+                xhr.send();
+
+                xhr.onprogress = () => {
+                    const newData = xhr.responseText.substring(xhr.seenBytes || 0);
+                    xhr.seenBytes = xhr.responseText.length;
+
+                    const lines = newData.split("\n\n");
+                    lines.forEach(line => {
+                        if (line.startsWith("data: ")) {
+                            const content = line.substring(6);
+                            if (content === "[DONE]") {
+                                this.isLoading = false;
+                            } else {
+                                this.currentResponse += content;
+                            }
+                        }
+                    });
+
+                    this.$nextTick(() => {
+                        const contentArea = document.querySelector('.content-area');
+                        contentArea.scrollTop = contentArea.scrollHeight;
+                    });
+                };
+
+                xhr.onloadend = () => {
+                    this.isLoading = false;
+                    if (this.currentResponse) {
+                        // Добавляем сообщение о сбросе сессии
+                        this.messages.push({
+                            question: "Система",
+                            response: this.formatResponse(this.currentResponse)
+                        });
+                    }
+                    this.currentResponse = '';
+                };
+            },
+            formatResponse(text) {
+                text = this.makeLinksActive(text);
+                text = this.shortenLinks(text);
+                text = this.formatResponseWithLinebreaks(text);
+                return text;
+            },
+            formatResponseWithLinebreaks(text) {
+                text = text.replace(/(\s)(\d+\.)/g, '$1\n$2');
+                text = text.replace(/(\s)(шаг \d+)/gi, '$1\n$2');
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                text = text.replace(/\n\n+/g, '</p><p>');
+                text = text.replace(/\n/g, '<br>');
+                return `<p>${text}</p>`;
+            },
+            makeLinksActive(text) {
+                const urlPattern = /(https?:\/\/\S+?)(\.)?(\s|$|[)\]])/g;
+                text = text.replace(urlPattern, '<a href="$1" target="_blank">$1</a>$2$3');
+                const markdownPattern = /\[(.*?)\]\((https?:\/\/\S+?)(\.)?\)/g;
+                return text.replace(markdownPattern, '<a href="$2" target="_blank">$1</a>$3');
+            },
+            shortenLinks(text) {
+                const linkRegex = /\[([^\]]+)\]\(<a href="([^"]+)" target="_blank">([^<]+)<\/a>\)/g;
+                return text.replace(linkRegex, '<a href="$2" target="_blank">$1</a>');
+            }
+        }
+    });
+    {% endraw %}
+    </script>
+</body>
+</html>

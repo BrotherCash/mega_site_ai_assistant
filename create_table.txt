@@ -1,0 +1,33 @@
+CREATE TABLE data_downloader_settings (
+    id INTEGER PRIMARY KEY,
+    folder TEXT,
+    content_formatter TEXT
+    download_enabled BOOLEAN
+);
+
+CREATE TABLE urls (
+    id INTEGER PRIMARY KEY,
+    downloader_setting_id INTEGER,
+    url TEXT,
+    FOREIGN KEY (downloader_setting_id) REFERENCES data_downloader_settings(id)
+);
+
+CREATE TABLE data_indexer_settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title_extractor_nodes INTEGER,
+    questions_answered_extractor_questions INTEGER,
+    keyword_extractor_keywords INTEGER,
+    index_persist_dir TEXT,
+    force_index BOOLEAN,
+    chunk_size INTEGER,
+    chunk_overlap INTEGER,
+    llm_temperature REAL,
+    llm_model TEXT
+);
+
+CREATE TABLE request_settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    top_k_value INTEGER,
+    question TEXT,
+    question_extra_data TEXT
+);

@@ -1,0 +1,31 @@
+# data_downloader_settings
+
+FOLDER: "./help"
+CONTENT_FORMATTER: "HelpMegagroupRu"
+DOWNLOAD_ENABLED: False
+
+# urls
+URLS:
+  - https://help.megagroup.ru/cms/basic/new
+  - https://help.megagroup.ru/obzor-vozmozhnostey-cms-s3
+
+# data_indexer_settings
+
+TITLE_EXTRACTOR_NODES: 5
+QUESTIONS_ANSWERED_EXTRACTOR_QUESTIONS: 5
+KEYWORD_EXTRACTOR_KEYWORDS: 10
+
+INDEX_PERSIST_DIR: "./storage"
+FORCE_INDEX: False
+
+CHUNK_SIZE: 1024
+CHUNK_OVERLAP: 20
+LLM_TEMPERATURE: 0.2
+LLM_MODEL: 'gpt-3.5-turbo'
+
+# request settings
+
+TOP_K_VALUE: 5
+
+QUESTION: "Я хочу фотогалерею на свой сайт."
+QUESTION_EXTRA_DATA: "Отвечай на русском. Ответь в развернутой форме. В конце ответа добавь ссылку на основную статью."
