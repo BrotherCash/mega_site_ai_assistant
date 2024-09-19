@@ -53,6 +53,9 @@ def format_message(text):
     # Заменяем ссылки формата [текст](url) на HTML-ссылки
     text = re.sub(r'\[(.*?)\]\((https?://\S+)\)', r'<a href="\2">\1</a>', text)
 
+    # Добавляем перенос строки перед нумерованными списками
+    text = re.sub(r'(?<!\n)(\d+\.\s)', r'\n\1', text)
+
     return text
 
 

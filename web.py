@@ -1,4 +1,6 @@
 # загрузка flask
+import json
+
 from flask import Flask, render_template, request, redirect, jsonify, session, Response, stream_with_context, url_for, send_file
 from flask_session import Session
 
@@ -416,7 +418,6 @@ def history():
                            per_page=per_page,
                            total_pages=total_pages)
 
-
 @app.route('/download_history_csv')
 def download_history_csv():
     with SQLiteDB(DATABASE) as db:
@@ -451,6 +452,23 @@ def reset_session():
                 yield f"data: {chunk}\n\n"
         yield "data: [DONE]\n\n"
     return Response(stream_with_context(generate()), content_type='text/event-stream')
+
+@app.route('/manual')
+def manual():
+    return render_template('manual.html')
+
+@app.route('/save_json', methods=['POST'])
+def save_json():
+    datas = request.json
+    content = {}
+    for key, value in datas.items():
+        if key != 'name':
+            content[key] = value
+    # Сохраняем JSON в файл
+    with open(f'help/{datas["name"]}.json', 'w', encoding='utf-8') as f:
+        json.dump(content, f, ensure_ascii=False, indent=4)
+
+    return jsonify({f"message": f"JSON успешно сохранен в файл {datas['name']}.json"}), 200
 
 
 if __name__ == '__main__':

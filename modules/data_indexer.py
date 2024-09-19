@@ -26,19 +26,35 @@ class DataIndexer:
             def get_meta(file_path):
                 meta_data = {}
 
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    lines = file.readlines()
+                if not os.path.exists(file_path):
+                    print(f"Файл по пути {file_path} не найден.")
+                    return
 
-                    for line in lines:
-                        if line.startswith("[Ссылка на статью:"):
-                            meta_data["article_url"] = line.split(": ", 1)[1].strip().strip("]")
-                        elif line.startswith("[Заголовок статьи:"):
-                            meta_data["article_title"] = line.split(": ", 1)[1].strip().strip("]")
-                        elif line.startswith("[Видео:"):
-                            video_links = line.split(": ", 1)[1].strip().strip("[]").replace("'", "").split(", ")
-                            meta_data["article_video"] = video_links
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        meta_data = json.load(file)
+                        del meta_data['content']
+                except json.JSONDecodeError as e:
+                    print(f"Ошибка чтения JSON: {e}")
+                except Exception as e:
+                    print(f"Произошла ошибка: {e}")
 
                 return meta_data
+
+                # with open(file_path, 'r', encoding='utf-8') as file:
+                #     lines = file.readlines()
+                #     data = json.load(file)
+                #     print(data)
+                #     for line in lines:
+                #         if line.startswith("[Ссылка на статью:"):
+                #             meta_data["article_url"] = line.split(": ", 1)[1].strip().strip("]")
+                #         elif line.startswith("[Заголовок статьи:"):
+                #             meta_data["article_title"] = line.split(": ", 1)[1].strip().strip("]")
+                #         elif line.startswith("[Видео:"):
+                #             video_links = line.split(": ", 1)[1].strip().strip("[]").replace("'", "").split(", ")
+                #             meta_data["article_video"] = video_links
+
+                # return meta_data
 
             reader = SimpleDirectoryReader(input_dir=self.folder, file_metadata=get_meta)
             documents = reader.load_data()
