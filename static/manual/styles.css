@@ -1,0 +1,27 @@
+@charset "utf-8";
+/* CSS Document */
+
+.form-block {
+    border: 1px solid #999;
+    padding: 5px 5px 1px;
+}
+
+.form-block input {
+    padding: 10px;
+    width: calc( 100% - 22px );
+    margin: 0 0 5px;
+}
+
+.form-block textarea {
+    padding: 10px;
+    width: calc( 100% - 22px );
+}
+
+.form-block textarea {
+    width: calc( 100% - 20px );
+}
+
+#jsonOutput { 
+	width: calc( 100% - 6px );
+	margin-top: 10px;
+}
