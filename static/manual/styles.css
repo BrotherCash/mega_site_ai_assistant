@@ -25,3 +25,63 @@
 	width: calc( 100% - 6px );
 	margin-top: 10px;
 }
+
+.content-wrapper {
+    display: flex;
+    flex: 1 0 100%;
+    max-width: 1440px;
+    margin: 20px auto;
+}
+
+.left-column {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 300px;
+}
+
+.right-column {
+    display: flex;
+    flex: 1;
+    width: 100%;
+}
+
+.right-column form#myForm {
+    width: 100%;
+}
+
+.left-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.left-column ul li a {
+    text-decoration: none;
+    background: #dfe1e3;
+    display: block;
+    padding: 10px;
+    color: #111;
+}
+
+.left-column ul li a.active {
+    background: #198754;
+    color: #fff;
+}
+
+.left-column ul li {
+    margin: 0 0 3px;
+    position: relative;
+}
+
+a.new_file {
+    text-decoration: none;
+    background: #198754;
+    display: block;
+    padding: 10px;
+    color: #fff;
+}
+
+.left-column ul li a.delete {position: absolute;top: 50%;right: 10px;margin-top: -14px;background: none;padding: 0;}
+
+.left-column ul li a.delete img {
+    height: 16px;
+}

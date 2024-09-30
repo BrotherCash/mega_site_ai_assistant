@@ -1,3 +1,4 @@
+import asyncio
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
@@ -73,7 +74,6 @@ def get_reset_keyboard():
     keyboard = [[KeyboardButton("Сбросить сессию")]]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
-
 async def reset_session(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
     session_id = f"tg_{user_id}"
@@ -103,6 +103,17 @@ def save_chat_history(db, session_id, message):
     db.insert_into_table('chat_history', (None, session_id, current_time, message['role'], message['content']))
 
 
+async def simulate_typing(context: ContextTypes.DEFAULT_TYPE, chat_id: int, duration: float):
+    """
+    Имитирует набор текста ботом в течение указанного времени.
+
+    :param context: Контекст бота
+    :param chat_id: ID чата
+    :param duration: Продолжительность "набора" в секундах
+    """
+    await context.bot.send_chat_action(chat_id=chat_id, action="typing")
+    await asyncio.sleep(duration)
+
 # test
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     cleanup_inactive_chat_engines()
@@ -131,6 +142,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Форматируем ответ
         formatted_response = format_message(response)
 
+        # Имитируем набор ответа
+        typing_duration = min(len(formatted_response) * 0.05, 10.0)  # Максимум 10 секунд
+        await simulate_typing(context, chat_id, typing_duration)
+
+
         # Проверяем условия для отображения кнопки связи с оператором
         show_operator_button = (
                 "свяжитесь с оператором" in response.lower() or
@@ -150,7 +166,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 parse_mode='HTML',
                 reply_markup=get_reset_keyboard()
             )
-
 
 def ask_question(form, db, loaded_index, session_id):
     global user_chat_engines

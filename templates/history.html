@@ -8,30 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <img src="static/img/logo_mega.svg" alt="Megagroup" width="200">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item me-2">
-                        <a class="btn btn-outline-success" href="/">Главная</a>
-                    </li>
-                    <li class="nav-item me-2">
-                        <a class="btn btn-outline-success" href="/settings">Настройки</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-success disabled" aria-current="page" href="#">История</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+    {% include 'menu.html' %}
     <div class="container mt-4">
         <h2>Chat History</h2>
         <div class="mb-3 d-flex justify-content-between align-items-center">

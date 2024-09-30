@@ -455,7 +455,23 @@ def reset_session():
 
 @app.route('/manual')
 def manual():
-    return render_template('manual.html')
+
+    folder_path = 'help'  # Замените на путь к вашей папке
+    files = []
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            file_stats = os.stat(file_path)
+            files.append(filename)
+    name = {}
+    name[0] = ''
+    data = {}
+    current_file = ''
+
+    return render_template('manual.html', files=files, name=name[0], content=data, current_file=current_file)
+
+    return render_template('manual.html', files=files)
 
 @app.route('/save_json', methods=['POST'])
 def save_json():
@@ -469,6 +485,44 @@ def save_json():
         json.dump(content, f, ensure_ascii=False, indent=4)
 
     return jsonify({f"message": f"JSON успешно сохранен в файл {datas['name']}.json"}), 200
+
+@app.route('/openfile', methods=['GET'])
+def open_json():
+    datas = request.args
+
+    folder_path = 'help'  # Замените на путь к вашей папке
+    files = []
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            file_stats = os.stat(file_path)
+            files.append(filename)
+            if filename == datas['file']:
+                current_file = datas['file']
+                name = current_file.split('.')
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                    data = json.loads(content)
+
+
+    return render_template('manual.html', files=files, name=name[0], content=data, current_file=current_file)
+
+@app.route('/delete_file', methods=['GET'])
+def delete_file_json():
+    datas = request.args
+
+    folder_path = 'help'  # Замените на путь к вашей папке
+    file_path = os.path.join(folder_path, datas['file'])
+    try:
+        os.remove(file_path)
+        print(f"Файл {file_path} успешно удален.")
+    except FileNotFoundError:
+        print(f"Файл {file_path} не найден.")
+    except PermissionError:
+        print(f"Нет прав для удаления файла {file_path}.")
+
+    return redirect(f"/manual", code=302)
 
 
 if __name__ == '__main__':

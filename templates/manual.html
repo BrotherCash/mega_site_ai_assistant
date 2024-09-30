@@ -13,65 +13,55 @@
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="/">
-            <img src="static/img/logo_mega.svg" alt="Megagroup" width="200">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item me-2">
-                    <a class="btn btn-success" href="/">Главная</a>
-                </li>
-                <li class="nav-item me-2">
-                    <a class="btn btn-outline-success disabled" disabled aria-current="page" href="#">Настройки</a>
-                </li>
-                <li class="nav-item me-2">
-                    <a class="btn btn-success" href="/history">История</a>
-                </li>
-
-                <li class="nav-item me-2">
-                    <a class="btn btn-success" href="/manual">Ручной парсер</a>
-                </li>
-            </ul>
-        </div>
+{% include 'menu.html' %}
+<div class="content-wrapper">
+    <div class="left-column">
+        <ul>
+            {% for file in files %}
+            <li><a {% if current_file == file %}class="active"{% endif %} href="/openfile?file={{ file }}">{{ file }}</a><a
+                    href="/delete_file?file={{ file }}" class="delete"><img src="static/img/delete.png" height="32" alt=""></a></li>
+            {% endfor %}
+        </ul>
+        <a href="/manual" class="new_file">Добавить новый файл</a>
     </div>
-</nav>
-
-<form id="myForm" action="/save_json" method="post">
-<div class="form-block">
-	<div class="name"><input type="text" name="name" placeholder="Название файла. Пример: support"></div>
-	<div class="url"><input type="text" name="url" placeholder="URL"></div>
-	<div class="title"><input type="text" name="title" placeholder="title"></div>
-	<!-- <div class="links"><textarea name="links" id="links" cols="30" rows="10" placeholder="Links"></textarea></div> -->
-	<div class="content"><textarea name="content" id="mytextarea" cols="30" rows="10" placeholder="Content"></textarea></div>
-	<input type="submit" value="GetJSON">
+    <div class="right-column">
+        <form id="myForm" action="/save_json" method="post">
+            <div class="form-block">
+                <div class="name"><input type="text" name="name" placeholder="Название файла. Пример: support" value="{{ name }}"></div>
+                <div class="url"><input type="text" name="url" placeholder="URL"  value="{{ content['url'] }}"></div>
+                <div class="images"><input type="text" name="images" placeholder="images"  value="{{ content['images'] }}"></div>
+                <div class="title"><input type="text" name="title" placeholder="title" value="{{ content['title'] }}"></div>
+                <!-- <div class="links"><textarea name="links" id="links" cols="30" rows="10" placeholder="Links"></textarea></div> -->
+                <div class="content"><textarea name="content" id="mytextarea" cols="30" rows="10" placeholder="Content">{{ content['content'] }}</textarea></div>
+                <input type="submit" value="GetJSON">
+            </div>
+        </form>
+    </div>
 </div>
-</form>
+
+
+
     <script type="text/javascript">
 		tinymce.init({
 		  selector: '#mytextarea',
 		  plugins: 'code',
+		  promotion: false,
 		  toolbar: 'undo redo | formatselect | bold italic | code',
 		  block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6'
 		});
 
 
+        document.getElementById("myForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Останавливаем стандартное поведение отправки формы
 
-		  document.getElementById("myForm").addEventListener("submit", function(event) {
-		    event.preventDefault(); // Останавливаем стандартное поведение отправки формы
+            // Получаем данные формы
+            const formData = new FormData(event.target);
 
-		    // Получаем данные формы
-		    const formData = new FormData(event.target);
+            // Преобразуем FormData в обычный объект
+            const formObj = Object.fromEntries(formData.entries());
 
-		    // Преобразуем FormData в обычный объект
-		    const formObj = Object.fromEntries(formData.entries());
-
-		    // Преобразуем объект в JSON
-		    const jsonData = JSON.stringify(formObj, null, 2); // Добавляем отступы для удобного форматирования
+            // Преобразуем объект в JSON
+            const jsonData = JSON.stringify(formObj, null, 2); // Добавляем отступы для удобного форматирования
 
             fetch('/save_json', {
                 method: 'POST',
@@ -90,7 +80,7 @@
                 alert('Произошла ошибка при отправке данных');
             });
 
-		  });
+        });
 
 
     </script>
