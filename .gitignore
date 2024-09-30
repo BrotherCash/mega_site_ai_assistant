@@ -3,3 +3,4 @@
 .ipynb_checkpoints
 temp_documents/
 flask_session/
+bot.db
