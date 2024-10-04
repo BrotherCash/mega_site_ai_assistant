@@ -52,6 +52,8 @@
 .left-column ul {
     list-style: none;
     padding: 0;
+    height: 88.5vh;
+    overflow-y: auto;
 }
 
 .left-column ul li a {
@@ -84,4 +86,27 @@ a.new_file {
 
 .left-column ul li a.delete img {
     height: 16px;
+}
+
+.right-column input[type="submit"] {
+    width: calc( 50% - 20px );
+    display: inline-block;
+}
+
+.form-block a.new_file {
+    width: calc( 50% );
+    display: inline-block;
+    margin-left: 20px;
+    text-align: center;
+}
+
+.left-column input[type="submit"] {
+    text-decoration: none;
+    background: #198754;
+    display: block;
+    padding: 10px;
+    color: #fff;
+    border: none;
+    width: calc( 100% - 0px );
+    margin-top: 10px;
 }

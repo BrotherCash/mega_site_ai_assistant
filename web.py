@@ -525,6 +525,20 @@ def delete_file_json():
     return redirect(f"/manual", code=302)
 
 
+@app.route('/uploadfile', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return 'No file part'
+
+    file = request.files['file']
+    folder_path = 'help'  # Замените на путь к вашей папке
+
+
+    if file:
+        file.save(os.path.join(folder_path, file.filename))
+
+    return redirect(f"/manual", code=302)
+
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=5000)
     # app.run(host='127.0.0.1', port=5000)

@@ -22,7 +22,10 @@
                     href="/delete_file?file={{ file }}" class="delete"><img src="static/img/delete.png" height="32" alt=""></a></li>
             {% endfor %}
         </ul>
-        <a href="/manual" class="new_file">Добавить новый файл</a>
+                    <form action="/uploadfile" method="post" enctype="multipart/form-data">
+                        <input name="file" type="file">
+                        <input type="submit" value="Загрузить новый файл">
+                    </form>
     </div>
     <div class="right-column">
         <form id="myForm" action="/save_json" method="post">
@@ -33,7 +36,7 @@
                 <div class="title"><input type="text" name="title" placeholder="title" value="{{ content['title'] }}"></div>
                 <!-- <div class="links"><textarea name="links" id="links" cols="30" rows="10" placeholder="Links"></textarea></div> -->
                 <div class="content"><textarea name="content" id="mytextarea" cols="30" rows="10" placeholder="Content">{{ content['content'] }}</textarea></div>
-                <input type="submit" value="GetJSON">
+                <input type="submit" value="GetJSON"><a href="/manual" class="new_file">Добавить новый файл</a>
             </div>
         </form>
     </div>
