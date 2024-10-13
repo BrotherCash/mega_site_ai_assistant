@@ -7,7 +7,7 @@
 }
 
 .form-block input {
-    padding: 10px;
+    padding: 2px 10px;
     width: calc( 100% - 22px );
     margin: 0 0 5px;
 }
@@ -21,7 +21,7 @@
     width: calc( 100% - 20px );
 }
 
-#jsonOutput { 
+#jsonOutput {
 	width: calc( 100% - 6px );
 	margin-top: 10px;
 }
@@ -36,7 +36,8 @@
 .left-column {
     display: flex;
     flex-direction: column;
-    flex: 0 0 300px;
+    flex: 0 0 250px;
+    max-width: 250px;
 }
 
 .right-column {
@@ -52,7 +53,7 @@
 .left-column ul {
     list-style: none;
     padding: 0;
-    height: 88.5vh;
+    height: 83.3vh;
     overflow-y: auto;
 }
 
@@ -60,8 +61,9 @@
     text-decoration: none;
     background: #dfe1e3;
     display: block;
-    padding: 10px;
+    padding: 10px 10px 10px 24px;
     color: #111;
+    overflow: hidden;
 }
 
 .left-column ul li a.active {
@@ -91,6 +93,7 @@ a.new_file {
 .right-column input[type="submit"] {
     width: calc( 50% - 20px );
     display: inline-block;
+    padding: 8px;
 }
 
 .form-block a.new_file {
@@ -109,4 +112,62 @@ a.new_file {
     border: none;
     width: calc( 100% - 0px );
     margin-top: 10px;
+}
+
+.left-column .top-panel {
+    position: relative;
+    padding: 5px 5px 5px 24px;
+    background: #198754;
+    color: #fff;
+}
+
+.col1 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+}
+
+.col1 input {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    margin-top: -6px;
+}
+
+.deletebtn {
+    display: none;
+}
+
+.deletebtn.show {
+    display: block;
+    position: absolute;
+    right: 0px;
+    top: 0;
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 20px;
+    background: #f00;
+}
+
+.form-block .title {
+    margin: 0 10px 5px 0px;
+    font-weight: 600;
+    width: 160px;
+    text-align: right;
+}
+
+.form-block > div {
+    display: flex;
+    align-items: center;
+}
+
+.form-block > div > div {
+    width: calc(100% - 22px);
+    !i;!;!o;!;
+}
+
+.tox.tox-tinymce {
+    height: 475px !important;!i;!;
 }

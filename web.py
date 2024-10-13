@@ -456,7 +456,7 @@ def reset_session():
 @app.route('/manual')
 def manual():
 
-    folder_path = 'help'  # Замените на путь к вашей папке
+    folder_path = 'mega'  # Замените на путь к вашей папке
     files = []
 
     for filename in os.listdir(folder_path):
@@ -481,7 +481,7 @@ def save_json():
         if key != 'name':
             content[key] = value
     # Сохраняем JSON в файл
-    with open(f'help/{datas["name"]}.json', 'w', encoding='utf-8') as f:
+    with open(f'mega/{datas["name"]}.json', 'w', encoding='utf-8') as f:
         json.dump(content, f, ensure_ascii=False, indent=4)
 
     return jsonify({f"message": f"JSON успешно сохранен в файл {datas['name']}.json"}), 200
@@ -490,7 +490,7 @@ def save_json():
 def open_json():
     datas = request.args
 
-    folder_path = 'help'  # Замените на путь к вашей папке
+    folder_path = 'mega'  # Замените на путь к вашей папке
     files = []
 
     for filename in os.listdir(folder_path):
@@ -512,7 +512,7 @@ def open_json():
 def delete_file_json():
     datas = request.args
 
-    folder_path = 'help'  # Замените на путь к вашей папке
+    folder_path = 'mega'  # Замените на путь к вашей папке
     file_path = os.path.join(folder_path, datas['file'])
     try:
         os.remove(file_path)
@@ -524,6 +524,23 @@ def delete_file_json():
 
     return redirect(f"/manual", code=302)
 
+@app.route('/selectingdelete', methods=['POST'])
+def selectingdelete():
+    datas = request.json
+    for id in datas['ids']:
+        folder_path = 'mega'  # Замените на путь к вашей папке
+        file_path = os.path.join(folder_path, id)
+        try:
+            os.remove(file_path)
+            print(f"Файл {file_path} успешно удален.")
+        except FileNotFoundError:
+            print(f"Файл {file_path} не найден.")
+        except PermissionError:
+            print(f"Нет прав для удаления файла {file_path}.")
+
+    return jsonify({f"message": f"JSON успешно удален"}), 200
+
+
 
 @app.route('/uploadfile', methods=['POST'])
 def upload_file():
@@ -531,7 +548,7 @@ def upload_file():
         return 'No file part'
 
     file = request.files['file']
-    folder_path = 'help'  # Замените на путь к вашей папке
+    folder_path = 'mega'  # Замените на путь к вашей папке
 
 
     if file:

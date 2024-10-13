@@ -16,10 +16,14 @@
 {% include 'menu.html' %}
 <div class="content-wrapper">
     <div class="left-column">
+        <div class="top-panel">
+            <div class="col1"><input type="checkbox"></div>
+            <div class="col2"> Все <a class="deletebtn" href="/selectingdelete">Удалить</a></div>
+        </div>
         <ul>
             {% for file in files %}
-            <li><a {% if current_file == file %}class="active"{% endif %} href="/openfile?file={{ file }}">{{ file }}</a><a
-                    href="/delete_file?file={{ file }}" class="delete"><img src="static/img/delete.png" height="32" alt=""></a></li>
+            <li><div class="col1"><input type="checkbox" value="{{ file }}"></div><div class="col2"><a {% if current_file == file %}class="active"{% endif %} href="/openfile?file={{ file }}">{{ file }}</a><a
+                    href="/delete_file?file={{ file }}" class="delete"><img src="static/img/delete.png" height="32" alt=""></a></div></li>
             {% endfor %}
         </ul>
                     <form action="/uploadfile" method="post" enctype="multipart/form-data">
@@ -28,15 +32,25 @@
                     </form>
     </div>
     <div class="right-column">
-        <form id="myForm" action="/save_json" method="post">
+        <form id="myForm" action="/save_json" method="post" onsubmit="tinyMCE.triggerSave();">
             <div class="form-block">
-                <div class="name"><input type="text" name="name" placeholder="Название файла. Пример: support" value="{{ name }}"></div>
-                <div class="url"><input type="text" name="url" placeholder="URL"  value="{{ content['url'] }}"></div>
-                <div class="images"><input type="text" name="images" placeholder="images"  value="{{ content['images'] }}"></div>
-                <div class="title"><input type="text" name="title" placeholder="title" value="{{ content['title'] }}"></div>
+                <div class="name">
+                    <div class="title">Название файла</div>
+                    <input type="text" name="name" placeholder="Название файла. Пример: support" value="{{ name }}"></div>
+                <div class="url">
+                    <div class="title">URL</div>
+                    <input type="text" name="url" placeholder="URL"  value="{{ content['url'] }}"></div>
+                <div class="images">
+                    <div class="title">Картинки</div>
+                    <input type="text" name="images" placeholder="images"  value="{{ content['images'] }}"></div>
+                <div class="headline">
+                    <div class="title">Заголовок</div>
+                    <input type="text" name="title" placeholder="title" value="{{ content['title'] }}"></div>
                 <!-- <div class="links"><textarea name="links" id="links" cols="30" rows="10" placeholder="Links"></textarea></div> -->
-                <div class="content"><textarea name="content" id="mytextarea" cols="30" rows="10" placeholder="Content">{{ content['content'] }}</textarea></div>
-                <input type="submit" value="GetJSON"><a href="/manual" class="new_file">Добавить новый файл</a>
+                <div class="content">
+                    <div class="title">Контент</div>
+                    <textarea name="content" id="mytextarea" cols="30" rows="10" placeholder="Content">{{ content['content'] }}</textarea></div>
+                <input type="submit" value="Сохранить"><a href="/manual" class="new_file">Добавить новый файл</a>
             </div>
         </form>
     </div>
@@ -49,8 +63,10 @@
 		  selector: '#mytextarea',
 		  plugins: 'code',
 		  promotion: false,
-		  toolbar: 'undo redo | formatselect | bold italic | code',
-		  block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6'
+		  block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6',
+          toolbar: 'undo redo | formatselect fontselect fontsizeselect | bold italic underline strikethrough ' +
+                 '| alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
+                 'link image media | forecolor backcolor emoticons | preview fullscreen code'
 		});
 
 
@@ -79,14 +95,75 @@
                 window.location.reload();
             })
             .catch(error => {
-                console.error('Ошибка:', error);
+                console.log('Ошибка:', error);
                 alert('Произошла ошибка при отправке данных');
             });
 
         });
 
+ document.addEventListener('DOMContentLoaded', function() {
+    const topPanelCheckbox = document.querySelector('.top-panel input[type="checkbox"]');
+    const leftColumnCheckboxes = document.querySelectorAll('.left-column ul li input[type="checkbox"]');
+    const deleteBtn = document.querySelector('.deletebtn');
 
-    </script>
+    function isAnyCheckboxChecked() {
+        return Array.from(leftColumnCheckboxes).some(checkbox => checkbox.checked);
+    }
+
+    function updateDeleteBtnVisibility() {
+        if (isAnyCheckboxChecked()) {
+            deleteBtn.classList.add('show');
+        } else {
+            deleteBtn.classList.remove('show');
+        }
+    }
+
+    topPanelCheckbox.addEventListener('change', function() {
+        leftColumnCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteBtnVisibility();
+    });
+
+    leftColumnCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateDeleteBtnVisibility);
+    });
+
+    // Обработчик для кнопки удаления
+    deleteBtn.addEventListener('click', function(e) {
+        e.preventDefault(); // Предотвращаем стандартное поведение ссылки
+
+        const checkedBoxes = Array.from(leftColumnCheckboxes).filter(checkbox => checkbox.checked);
+
+        if (checkedBoxes.length === 0) {
+            alert('Не выбраны элементы для удаления');
+            return;
+        }
+
+        const ids = checkedBoxes.map(checkbox => checkbox.value);
+        const url = this.getAttribute('href');
+
+        // Отправляем AJAX запрос
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ ids: ids })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Успех:', data);
+            window.location.reload()
+        })
+        .catch((error) => {
+
+            // Здесь можно добавить код для обработки ошибок
+        });
+    });
+});
+</script>
 
 </body>
 </html>

@@ -5,3 +5,4 @@ temp_documents/
 flask_session/
 __pycache__/
 bot.db
+/mega/
